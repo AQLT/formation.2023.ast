@@ -1,0 +1,8 @@
+auteur: "Alain Quartier-la-Tente"
+titre:
+  pres: "Analyse des séries temporelles avec {{< fa brands r-project >}}"
+  website: "CEPE AST 2023"
+sous-titre: ""
+repo-github: "formation.2023.ast"
+description: "Formation Analyse des séries temporelles avec R - 2023"
+
