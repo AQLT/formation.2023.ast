@@ -259,7 +259,7 @@ autoplot(co2) + autolayer(mod, PI = FALSE, series = "Holt") +
 	autolayer(mod_damped, PI = FALSE, series = "Holt Damped trend") + 
 	autolayer(fitted(mod), series = "Fitted") +
 	labs(y = "ppm",
-		 title  = "Concentration atmosphérique annuelle en CO2 à Mauna Loa")
+		 title  = "Concentration atmosphérique mensuelle en CO2 à Mauna Loa")
 ```
 
 ### Holt-Winter
@@ -395,7 +395,7 @@ knitr::include_graphics("img/ets_multi.pdf")
 
 ### Sous R
 
-Pour les objets `ts` : `forecast::ets()` avec paramètre `damped = TRUE` ou `damped = TRUE`.
+Pour les objets `ts` : `forecast::ets()` avec paramètre `damped = FALSE` ou `damped = TRUE`.
 
 Pour les objets `tsibble` : `fable::ETS()` avec fonctions `error()`, `trend()` et `season()`
 
