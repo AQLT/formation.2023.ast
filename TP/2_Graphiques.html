@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.5.6">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Alain Quartier-la-Tente">
 
-<title>CEPE AST 2023 - 2 - Analyse graphique</title>
+<title>{{&lt; var titre.website &gt;}} – 2 - Analyse graphique</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,7 +23,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -83,7 +83,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "Pas de résultats",
     "search-matching-documents-text": "documents trouvés",
@@ -92,6 +98,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "correspondance de plus dans ce document",
     "search-more-matches-text": "correspondances de plus dans ce document",
     "search-clear-button-title": "Effacer",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Annuler",
     "search-submit-button-title": "Envoyer",
     "search-label": "Recherche"
@@ -115,15 +122,42 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
 </head>
 
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">CEPE AST 2023</span>
     </a>
@@ -135,25 +169,25 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html" rel="" target=""><i class="bi bi-house" role="img">
+    <a class="nav-link" href="../index.html"> <i class="bi bi-house" role="img">
 </i> 
- <span class="menu-text">Analyse des séries temporelles avec <i class="fa-brands fa-r-project" aria-label="r-project"></i></span></a>
+<span class="menu-text">Analyse des séries temporelles avec R</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://aqlt.github.io/teaching/" rel="" target="">
- <span class="menu-text">Ensemble formations</span></a>
+    <a class="nav-link" href="https://aqlt.github.io/teaching/"> 
+<span class="menu-text">Ensemble formations</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="http://github.com/AQLT/formation.2023.ast" rel="" target=""><i class="bi bi-github" role="img">
+    <a class="nav-link" href="http://github.com/AQLT/formation.2023.ast"> <i class="bi bi-github" role="img">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
-            <div class="quarto-navbar-tools">
-</div>
           </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -200,20 +234,22 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
   </div>
   
 
+
 </header>
+
 
 <blockquote class="blockquote">
 <p>L’objectif de ce TP est d’approfondir les analyses graphiques et les transformations pour stabiliser la variance.</p>
 </blockquote>
 <p>Les packages suivants seront utilisés :</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/unnamed-chunk-1_fec1c26eea22bd5ef7b04f4266b65db7">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>packages_to_install <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"forecast"</span>, <span class="st">"ggplot2"</span>, <span class="st">"patchwork"</span>, <span class="st">"lubridate"</span>, <span class="st">"USgas"</span>, <span class="st">"tsibble"</span>, <span class="st">"fpp2"</span>, <span class="st">"fpp3"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> packages_to_install[<span class="sc">!</span> packages_to_install <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[,<span class="st">"Package"</span>]]</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(packages) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(packages)</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell" data-hash="2_Graphiques_cache/html/unnamed-chunk-2_94a53620d93ab4cff445ee43a5d9054e">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forecast)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
@@ -271,29 +307,41 @@ Solution
 <div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p><code>gold</code> représente les prix journaliers de l’or en dollar (hors vendredi et samedi) entre le 1er janvier 1985 et le 31 Mars 1989. Il semble y avoir des valeurs manquantes, un point atypique autour de l’observation 750. Une tendance plutôt à la hausse jusqu’à cette observation puis une tendance à la baisse. Pas de saisonnalité visible</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/gold_fa558f37d6aeb2ba6b7a43dd0175126b">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(gold, <span class="at">y =</span> <span class="st">"Prix en $"</span>,</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="st">"Prix journaliers de l'or"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/gold-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/gold-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p><code>woolyrnq</code> représente la production trimestrielle de laine en Australie (en tonnes) entre le premier trimestre 1965 et le troisième trimestre 1994.</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/woolyrnq_8b7b43e46438c5ede0c5b993e4d0f45f">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(woolyrnq, <span class="at">y =</span> <span class="st">"tonnes"</span>,</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">main =</span> <span class="st">"Production trimestrielle de laine en Australie"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/woolyrnq-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/woolyrnq-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p><code>gas</code> représente la production mensuelle de gaz en Australie entre janvier 1956 et août 1995</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/gas_c090cf2ffc727bbecaec0d15c7de6dbe">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(gas, <span class="at">main =</span> <span class="st">"Production mensuelle de gaz en Australie"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/gas-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/gas-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
-<div class="cell" data-hash="2_Graphiques_cache/html/unnamed-chunk-3_3ac7cb5b3c748ca97bf17aab59e0b00e">
+</div>
+<div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Point atypique net pour la série gold à l'observation 770</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">which.max</span>(gold)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -342,25 +390,37 @@ Solution
 </div>
 <div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="cell" data-hash="2_Graphiques_cache/html/aus-arrivals_d365becb8faac8458278f8d0b9417201">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>aus_arrivals <span class="sc">%&gt;%</span> <span class="fu">autoplot</span>(Arrivals)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/aus-arrivals-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/aus-arrivals-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Le nombre d’arrivées augmentent avec le temps, sauf ceux en provenance du Japon après 1995. Les séries semblent saisonnières avec une saisonnalité qui dépend du niveau (sauf pour US) et on observe un changement de saisonnalité pour les arrivées en provenance du Japon</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/aus-arrivals-season_4af25d1b49a8959e7dedd6c483cde811">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>aus_arrivals <span class="sc">%&gt;%</span> <span class="fu">gg_season</span>(Arrivals)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/aus-arrivals-season-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/aus-arrivals-season-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Remarque : le multivarié ne marche pas avec forecast. <code>forecast::ggseasonplot(arrivals)</code> donne une erreur.</p>
 <p>La saisonnalité est différente entre chaque pays : arrivées plus élevées aux T1 et T4 pour le Royaume-Uni. elles sont plus faibles au T1 pour la Nouvelle-Zélande et au plus haut au T3. Pour le Japon : plus faibles aux T2 et T4 sur années récentes. Pour les États-Unis le graphique n’est pas facile à lire</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/aus-arrivals-subseries_f9e60714a551674f97fb1153e92c6d03">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>aus_arrivals <span class="sc">%&gt;%</span> <span class="fu">gg_subseries</span>(Arrivals)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/aus-arrivals-subseries-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/aus-arrivals-subseries-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Pour le Royaume-Uni la hausse des entrées est surtout saisonnière (forte hausse aux T1 et T3). Depuis les États-Unis et la Nouvelle-Zélande la hausse semble la même sur tous les trimestres.</p>
@@ -398,42 +458,66 @@ Solution
 </div>
 <div id="callout-7" class="callout-7-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="cell" data-hash="2_Graphiques_cache/html/hsales_0d34b753ec3c11417e9e0afb156dca61">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(hsales)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/hsales-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/hsales-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Pas de tendance, il semble il y avoir une saisonnalité et un cycle</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/hsales-season_fb9a301d2df4789ddd12d0fab9648d78">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggseasonplot</span>(hsales)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/hsales-season-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/hsales-season-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Les ventes semblent plus faibles en janv-déc et plus élevées en mars</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/hsales-subseries_267104c18d86333cb8ca1ee736d50e46">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsubseriesplot</span>(hsales)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/hsales-subseries-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/hsales-subseries-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>On retrouve en moyenne les résultats précédents mais les variations des coefficients saisonniers laissent penser à un cycle</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/hsales-lag_acfa5347d51d6b7a6035122ed3439838">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gglagplot</span>(hsales)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/hsales-lag-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/hsales-lag-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Forte corrélation avec les valeurs précédentes et les valeurs saisonnières</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/hsales-acf_01c926cbff50e6fcf0b81ba25652e58e">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggAcf</span>(hsales)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/hsales-acf-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/hsales-acf-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggAcf</span>(hsales, <span class="dv">12</span><span class="sc">*</span><span class="dv">7</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/hsales-acf-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/hsales-acf-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>En augmentant le nombre de lag on repère plus facilement les cycles longs (environ 8 ans).</p>
@@ -495,18 +579,26 @@ Solution
 </div>
 <div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="cell" data-hash="2_Graphiques_cache/html/spectre-tendance_39e281da3d8bdc70c9487988ec2ac66c">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>t <span class="ot">=</span> <span class="fu">ts</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">frequency =</span> <span class="dv">12</span>, <span class="at">start =</span> <span class="dv">2000</span>)</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">spectrum</span>(t, </span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">detrend =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"pgram"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/spectre-tendance-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/spectre-tendance-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spectrum</span>(t, </span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"ar"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/spectre-tendance-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/spectre-tendance-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -537,19 +629,27 @@ Solution
 </div>
 <div id="callout-12" class="callout-12-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="cell" data-hash="2_Graphiques_cache/html/spectre-saisonnalite_8d458144941f019753d2c49dca1000bb">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">=</span> <span class="fu">ts</span>(<span class="dv">0</span>, <span class="at">frequency =</span> <span class="dv">12</span>, <span class="at">start =</span> <span class="dv">2000</span>, <span class="at">end =</span> <span class="dv">2020</span>)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>s[<span class="fu">cycle</span>(s) <span class="sc">==</span> <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">spectrum</span>(s, </span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">detrend =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"pgram"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/spectre-saisonnalite-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/spectre-saisonnalite-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spectrum</span>(s, </span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"ar"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/spectre-saisonnalite-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/spectre-saisonnalite-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -580,18 +680,26 @@ Solution
 </div>
 <div id="callout-14" class="callout-14-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="cell" data-hash="2_Graphiques_cache/html/spectre-cycle_7b0346e1d55b267c9f0ceec9c0120ad9">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>c <span class="ot">=</span> <span class="fu">ts</span>(<span class="fu">cos</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">/</span><span class="dv">36</span><span class="sc">*</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>)) <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">/</span><span class="dv">36</span><span class="sc">*</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>)), <span class="at">frequency =</span> <span class="dv">12</span>, <span class="at">start =</span> <span class="dv">2000</span>)</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">spectrum</span>(c, </span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">detrend =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"pgram"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/spectre-cycle-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/spectre-cycle-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spectrum</span>(c, </span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"ar"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/spectre-cycle-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/spectre-cycle-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -608,7 +716,7 @@ Exercice
 </div>
 <div class="callout-body-container callout-body">
 <p>Pourquoi a-t-on un spectre différent en simulant un cycle de cette façon ?</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/spectre-cycle-saison_a2980e42724d8ceb71c0cdd281546124">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>c <span class="ot">=</span> <span class="fu">ts</span>(<span class="dv">0</span>, <span class="at">frequency =</span> <span class="dv">12</span>, <span class="at">start =</span> <span class="dv">2000</span>, <span class="at">end =</span> <span class="dv">2020</span>)</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>c[<span class="fu">cycle</span>(c) <span class="sc">==</span> <span class="dv">12</span>][<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>)] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>c</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -639,7 +747,11 @@ Exercice
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spectrum</span>(c, </span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"pgram"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/spectre-cycle-saison-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/spectre-cycle-saison-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -685,19 +797,27 @@ Solution
 </div>
 <div id="callout-18" class="callout-18-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="cell" data-hash="2_Graphiques_cache/html/spectre-irregulier_d78044cbdd0ed640853e5e4b39b68589">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>i <span class="ot">=</span> <span class="fu">ts</span>(<span class="fu">rnorm</span>(<span class="dv">100</span>), <span class="at">frequency =</span> <span class="dv">12</span>, <span class="at">start =</span> <span class="dv">2000</span>)</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">spectrum</span>(i, </span>
 <span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">detrend =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"pgram"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/spectre-irregulier-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/spectre-irregulier-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spectrum</span>(i, </span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"ar"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/spectre-irregulier-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/spectre-irregulier-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Question supplémentaire : à quoi correspond la droite du graphique précédent ?</p>
@@ -742,45 +862,65 @@ Solution
 </div>
 <div id="callout-20" class="callout-20-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<div class="cell" data-hash="2_Graphiques_cache/html/jj_6093da104a8b31e0fce41e12336bc524">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(JohnsonJohnson)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/jj-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/jj-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Il semble y avoir une saisonnalité plus importante lorsque la série est élevée et la tendance semble exponentielle.</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/jj-log_ee8a968adbc15401e9eefc9d390ec584">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">BoxCox</span>(JohnsonJohnson, <span class="dv">0</span>))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/jj-log-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/jj-log-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>La transformation en log semble trop forte : la variabilité au début de la série est plus importante qu’en fin de série.</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/jj-bc_244e3aa6f5a5420ec56dafb816cc91ed">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>(<span class="fu">autoplot</span>(<span class="fu">BoxCox</span>(JohnsonJohnson, <span class="fl">0.5</span>)) <span class="sc">+</span> <span class="fu">autoplot</span>(<span class="fu">BoxCox</span>(JohnsonJohnson, <span class="fl">0.3</span>))) <span class="sc">/</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    (<span class="fu">autoplot</span>(<span class="fu">BoxCox</span>(JohnsonJohnson, <span class="fl">0.1</span>)) <span class="sc">+</span> <span class="fu">autoplot</span>(<span class="fu">BoxCox</span>(JohnsonJohnson, <span class="fl">0.2</span>)))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/jj-bc-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/jj-bc-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>La racine carrée n’est assez forte mais les autres transformations semblent donner de bons résultats. La méthode Guerrero donne <span class="math inline">\(\lambda = 0,15\)</span>.</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/unnamed-chunk-4_69515b310dd60cc48e910ebc5226c66c">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BoxCox.lambda</span>(JohnsonJohnson)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.1540752</code></pre>
 </div>
 </div>
-<div class="cell" data-hash="2_Graphiques_cache/html/AirPassengers_2c827247e6542de9293301d3354477e1">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(AirPassengers)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/AirPassengers-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/AirPassengers-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Il semble y avoir une saisonnalité plus importante lorsque la série est élevée .</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/AirPassengers-bc_7b62e63aefb7eca62701d6e9d9872835">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">BoxCox</span>(AirPassengers, <span class="dv">0</span>))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/AirPassengers-bc-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/AirPassengers-bc-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BoxCox.lambda</span>(AirPassengers)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -788,14 +928,22 @@ Solution
 </div>
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">BoxCox</span>(AirPassengers, <span class="fu">BoxCox.lambda</span>(AirPassengers))) <span class="sc">+</span> <span class="fu">autoplot</span>(<span class="fu">log</span>(AirPassengers))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/AirPassengers-bc-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/AirPassengers-bc-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>La transformation en log semble suffisante. La méthode Guerrero donne <span class="math inline">\(\lambda = -0,3\)</span>. Le graphique est proche de celui du passage au logarithme : la recommandation est de garder la transformation en logarithme, plus explicable.</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/co2_cac250e06bb15b155a9da9bbdf6a414d">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(co2)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/co2-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/co2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BoxCox.lambda</span>(co2)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -803,7 +951,11 @@ Solution
 </div>
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(co2) <span class="sc">+</span> <span class="fu">autoplot</span>(<span class="fu">log</span>(co2))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/co2-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/co2-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Une tendance linéaire mais la saisonnalité n’est pas proportionnelle au niveau Aucune transformation n’est nécessaire. La méthode Guerrero donne <span class="math inline">\(\lambda = 0,0\)</span> (log) sans que cela change les résultats.</p>
@@ -811,21 +963,29 @@ Solution
 BoxCox.lambda(usdeaths)
 autoplot(usdeaths) + autoplot(BoxCox(usdeaths, 0))</code></pre>
 <p>Pas de tendance : aucune transformation n’est nécessaire. La méthode Guerrero donne <span class="math inline">\(\lambda = 0,0\)</span> (log) sans que cela change les résultats.</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/usgdp_5873dbbc72886357299a4d005419c1ca">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(usgdp)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/usgdp-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/usgdp-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>On observe une tendance exponentielle : il peut être utile de faire une transformation</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/usgdp-log_65c0f2cf3e5e15e7709f9c5b459e85b7">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(<span class="fu">BoxCox</span>(usgdp, <span class="dv">0</span>))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/usgdp-log-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/usgdp-log-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>La transformation en log semble suffisante, peut-être légèrement trop forte. La méthode Guerrero donne <span class="math inline">\(\lambda = 0,36\)</span>.</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/usgdp-bc_9c21c05eb374d39a9e0684094927ca0d">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">BoxCox.lambda</span>(usgdp)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0.366352</code></pre>
@@ -835,7 +995,11 @@ autoplot(usdeaths) + autoplot(BoxCox(usdeaths, 0))</code></pre>
 <span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">autoplot</span>(<span class="fu">BoxCox</span>(usgdp, <span class="fu">BoxCox.lambda</span>(usgdp)))  <span class="sc">+</span> </span>
 <span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method=</span><span class="st">'lm'</span>, <span class="at">formula=</span> y<span class="sc">~</span>x, <span class="at">size =</span> <span class="fl">0.5</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/usgdp-bc-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/usgdp-bc-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -852,10 +1016,14 @@ Exercice
 </div>
 <div class="callout-body-container callout-body">
 <p>Pourquoi la transformation de Box-Cox n’est pas adaptée à la série <code>expsmooth::cangas</code> ?</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/cangas_139d7df907f6875b7d0f93f160997285">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(cangas)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="2_Graphiques_files/figure-html/cangas-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="2_Graphiques_files/figure-html/cangas-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -878,7 +1046,7 @@ Solution
 </div>
 </div>
 <p>Les précédents exercices portaient uniquement les fonctions de <code>forecast</code>. Pour appliquer la méthode Guerrero avec un objet <code>tsibble</code> on peut utiliser la fonction <code>features(., features = guerrero)</code> :</p>
-<div class="cell" data-hash="2_Graphiques_cache/html/feasts-ex_0ee5ad850a384cdbe1920cc260b0e210">
+<div class="cell">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>aus_arrivals <span class="sc">%&gt;%</span> </span>
 <span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">features</span>(<span class="at">features =</span> guerrero)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -981,10 +1149,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -994,8 +1161,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1008,6 +1184,125 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -1051,6 +1346,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1076,6 +1372,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1137,10 +1459,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <script src="https://giscus.app/client.js" data-repo="AQLT/formations" data-repo-id="R_kgDOIepagw" data-category="Announcements" data-category-id="DIC_kwDOIepag84CSt5_" data-mapping="pathname" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="light" data-lang="fr" crossorigin="anonymous" data-loading="lazy" async="">
 </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="light">
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">Copyright 2023, Alain Quartier-la-Tente, Insee</div>   
+    <div class="nav-footer-left">
+<p>Copyright 2023, Alain Quartier-la-Tente, Insee</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
     </div>
@@ -1168,6 +1494,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+
 
 
 

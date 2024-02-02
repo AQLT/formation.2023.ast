@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.5.6">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Alain Quartier-la-Tente">
 
-<title>CEPE AST 2023 - 5 - Modèles ARIMA</title>
+<title>{{&lt; var titre.website &gt;}} – 5 - Modèles ARIMA</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,7 +23,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -83,7 +83,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "Pas de résultats",
     "search-matching-documents-text": "documents trouvés",
@@ -92,6 +98,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "correspondance de plus dans ce document",
     "search-more-matches-text": "correspondances de plus dans ce document",
     "search-clear-button-title": "Effacer",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Annuler",
     "search-submit-button-title": "Envoyer",
     "search-label": "Recherche"
@@ -115,15 +122,42 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
 </head>
 
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">CEPE AST 2023</span>
     </a>
@@ -135,25 +169,25 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html" rel="" target=""><i class="bi bi-house" role="img">
+    <a class="nav-link" href="../index.html"> <i class="bi bi-house" role="img">
 </i> 
- <span class="menu-text">Analyse des séries temporelles avec <i class="fa-brands fa-r-project" aria-label="r-project"></i></span></a>
+<span class="menu-text">Analyse des séries temporelles avec R</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://aqlt.github.io/teaching/" rel="" target="">
- <span class="menu-text">Ensemble formations</span></a>
+    <a class="nav-link" href="https://aqlt.github.io/teaching/"> 
+<span class="menu-text">Ensemble formations</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="http://github.com/AQLT/formation.2023.ast" rel="" target=""><i class="bi bi-github" role="img">
+    <a class="nav-link" href="http://github.com/AQLT/formation.2023.ast"> <i class="bi bi-github" role="img">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
-            <div class="quarto-navbar-tools">
-</div>
           </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -198,7 +232,9 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
   </div>
   
 
+
 </header>
+
 
 <blockquote class="blockquote">
 <p>L’objectif de ce TP est d’apprendre à manipuler des modèles (S)ARIMA</p>
@@ -274,7 +310,11 @@ Solution
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(LakeHuron)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/LakeHuron-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/LakeHuron-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Il y a potentiellement une tendance à la baisse donc peut-être une tendance à la baisse. A priori pas de raison de transformer la série.</p>
@@ -301,7 +341,11 @@ alternative hypothesis: stationary</code></pre>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ggPacf(LakeHuron)</span></span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(LakeHuron)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/LakeHuron-display-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/LakeHuron-display-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>L’ACF décroit de manière exponentielle et rapidement vers 0, ce n’est pas un signe de marche aléatoire. En revanche le premier coefficient est élevé ce qui peut laisser penser que l’on n’a pas une marche aléatoire mais un coefficient AR(1) élevé. Le PACF est nul à partir de l’ordre 3 : cela peut laisser penser à un processus AR d’ordre au plus 2. On estime un modèle ARIMA(2,0,0) avec une tendance (<em>drift</em>).</p>
@@ -337,7 +381,11 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A priori les résidus sont un bruit blanc :</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">checkresiduals</span>(mod_trend) </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/LakeHuron-residuals-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/LakeHuron-residuals-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -350,7 +398,11 @@ Model df: 2.   Total lags used: 10</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cpgram</span>(<span class="fu">residuals</span>(mod_trend))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/LakeHuron-residuals-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/LakeHuron-residuals-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># En considérant un AR(1) on a un modèle avec un AIC plus grand</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>mod_trend_ar1 <span class="ot">&lt;-</span> <span class="fu">Arima</span>(LakeHuron, <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="at">include.drift =</span> <span class="cn">TRUE</span>)</span>
@@ -458,7 +510,11 @@ Solution
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">window</span>(sunspot.year, <span class="at">start =</span> <span class="dv">1770</span>, <span class="at">end =</span> <span class="dv">1869</span>)</span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(y)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/sunspot.year-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/sunspot.year-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Pas de tendance ni de raison de transformer la série. Il y a des mouvements cycliques. A priori pas de raison de transformer la série. A priori pas une marche aléatoire.</p>
@@ -512,7 +568,11 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A priori les résidus sont un bruit blanc :</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">checkresiduals</span>(mod_ar2) </span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/sunspot.year-resod-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/sunspot.year-resod-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -525,7 +585,11 @@ Model df: 2.   Total lags used: 10</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cpgram</span>(<span class="fu">residuals</span>(mod_ar2))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/sunspot.year-resod-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/sunspot.year-resod-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Auto.arima sélectionne un ARIMA(2,0,1) qui a un AICc plus petit</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>mod_auto <span class="ot">&lt;-</span> <span class="fu">auto.arima</span>(y)</span>
@@ -598,21 +662,33 @@ Solution
 <div class="cell">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(AirPassengers)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/AirPassengers-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/AirPassengers-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Tendance claire avec une saisonnalité multiplicative. Il faut passer la série au log.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(<span class="fu">log</span>(AirPassengers))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/AirPassengers-log-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/AirPassengers-log-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>L’analyse de l’ACF montre une décroissance lente avec des pics saisonniers. L’analyse du PACF montre deux pics : à l’ordre 1 proche de 1 et à l’ordre 13. Le second pic à l’ordre 13 et non 12 peut suggérer une double différenciation <span class="math inline">\((1-B)(1-B^{12})\)</span>. La présence d’une saisonnalité a déjà été analysée dans les précédents TP : un test n’est pas nécessaire et on peut différencier à l’ordre 12.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggtsdisplay</span>(<span class="fu">diff</span>(<span class="fu">log</span>(AirPassengers), <span class="dv">12</span>))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/AirPassengers-diff-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/AirPassengers-diff-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>La série différenciée ne présente pas de tendance mais des périodes de hausse et de baisse. L’ACF décroit vers 0 mais pas de manière exponentielle. Le premier coefficient de l’ACF/PACF est élevé ce qui peut laisser penser que la série est toujours non-stationnaire</p>
@@ -655,7 +731,11 @@ alternative hypothesis: stationary</code></pre>
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggAcf</span>(<span class="fu">diff</span>(<span class="fu">diff</span>(<span class="fu">log</span>(AirPassengers), <span class="dv">12</span>), <span class="dv">1</span>)) <span class="sc">/</span></span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggPacf</span>(<span class="fu">diff</span>(<span class="fu">diff</span>(<span class="fu">log</span>(AirPassengers), <span class="dv">12</span>), <span class="dv">1</span>))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/AirPassengers-diff-double-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/AirPassengers-diff-double-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">=</span> <span class="fu">Arima</span>(AirPassengers, <span class="at">order =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>), <span class="at">seasonal =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="at">lambda =</span> <span class="dv">0</span>)</span>
 <span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Box.test</span>(<span class="fu">resid</span>(mod), <span class="at">fitdf =</span> <span class="dv">2</span>,<span class="at">lag =</span> <span class="dv">24</span>,<span class="at">type =</span> <span class="st">"Ljung"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -668,7 +748,11 @@ X-squared = 48.603, df = 22, p-value = 0.0009028</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cpgram</span>(<span class="fu">resid</span>(mod))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/AirPassengers-diff-double-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/AirPassengers-diff-double-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># checkresiduals(mod)</span></span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -677,7 +761,11 @@ X-squared = 48.603, df = 22, p-value = 0.0009028</code></pre>
 <div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggAcf</span>(<span class="fu">residuals</span>(mod)) <span class="sc">/</span></span>
 <span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggPacf</span>(<span class="fu">residuals</span>(mod))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/AirPassengers-diff-double-acf-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/AirPassengers-diff-double-acf-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Encore pas de décroissance claire mais un pic à l’ordre 1. On peut donc penser que <span class="math inline">\(p,q, P,q \leq 1\)</span></p>
@@ -694,7 +782,11 @@ X-squared = 24.669, df = 20, p-value = 0.2144</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cpgram</span>(<span class="fu">resid</span>(mod1))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/AirPassengers-arma-comp-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/AirPassengers-arma-comp-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>lmtest<span class="sc">::</span><span class="fu">coeftest</span>(mod1)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -815,7 +907,11 @@ AIC=-483.4   AICc=-483.21   BIC=-474.77</code></pre>
 <div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>(y <span class="sc">%&gt;%</span> <span class="fu">ACF</span>(value <span class="sc">%&gt;%</span>  <span class="fu">difference</span>(<span class="dv">12</span>)) <span class="sc">%&gt;%</span> <span class="fu">autoplot</span>()) <span class="sc">/</span></span>
 <span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>    (y <span class="sc">%&gt;%</span> <span class="fu">PACF</span>(value <span class="sc">%&gt;%</span>  <span class="fu">difference</span>(<span class="dv">12</span>)) <span class="sc">%&gt;%</span> <span class="fu">autoplot</span>()) <span class="sc">&amp;</span> <span class="fu">ylim</span>(<span class="sc">-</span><span class="dv">1</span>,<span class="dv">1</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/tsibble-ex-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/tsibble-ex-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> y <span class="sc">%&gt;%</span></span>
 <span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">model</span>(<span class="at">arima =</span> <span class="fu">ARIMA</span>(value <span class="sc">~</span> <span class="dv">0</span> <span class="sc">+</span> <span class="fu">pdq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">+</span> <span class="fu">PDQ</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)),</span>
@@ -845,7 +941,11 @@ AIC=-483.4   AICc=-483.21   BIC=-474.77</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>model <span class="sc">%&gt;%</span> <span class="fu">residuals</span>() <span class="sc">%&gt;%</span>  <span class="fu">ACF</span>() <span class="sc">%&gt;%</span>  <span class="fu">autoplot</span>()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/tsibble-ex-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/tsibble-ex-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On peut utiliser la fonction report() sur un sous modèle</span></span>
 <span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>model <span class="sc">%&gt;%</span> <span class="fu">select</span>(auto_arima) <span class="sc">%&gt;%</span> </span>
@@ -866,7 +966,11 @@ AIC=856.88   AICc=857.32   BIC=863.11</code></pre>
 <span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">forecast</span>(<span class="at">h=</span><span class="dv">12</span>) <span class="sc">%&gt;%</span>  </span>
 <span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">autoplot</span>(y)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/tsibble-ex-3.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/tsibble-ex-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -908,18 +1012,30 @@ Solution
 <span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as_tsibble</span>(nottem)</span>
 <span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(y, value)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/nottem-plots-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/nottem-plots-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gg_season</span>(y, value)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/nottem-plots-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/nottem-plots-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Série déjà étudiée : a priori pas de transformation nécessaire, pas de tendance et saisonnalité mensuelle nette.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>y <span class="sc">%&gt;%</span> <span class="fu">gg_tsdisplay</span>(value <span class="sc">%&gt;%</span>  <span class="fu">difference</span>(<span class="dv">12</span>), <span class="at">plot_type =</span> <span class="st">"partial"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/nottem-diff12-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/nottem-diff12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>A priori série différenciée est stationnaire. L’analyse des ACF/PACF suggère <span class="math inline">\(P= 1\)</span> et/ou <span class="math inline">\(Q=1\)</span>, <span class="math inline">\(P&lt;=1\)</span> et <span class="math inline">\(Q &lt;= 2\)</span>. Pas de constante dans le modèle.</p>
@@ -984,7 +1100,11 @@ Solution
 <div class="cell">
 <div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>best_model <span class="sc">%&gt;%</span> <span class="fu">gg_tsresiduals</span>()</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/nottem-best-mod-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/nottem-best-mod-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(best_model) <span class="sc">%&gt;%</span> </span>
 <span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">features</span>(.innov, ljung_box, <span class="at">dof =</span> <span class="dv">3</span>, <span class="at">lag =</span> <span class="dv">24</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1034,7 +1154,11 @@ Solution
 <div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a><span class="fu">forecast</span>(compar_model, <span class="at">h =</span> <span class="st">"1 year"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">autoplot</span>(y <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">year</span>(index) <span class="sc">&gt;=</span> <span class="dv">1938</span>))</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/nottem-prem-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/nottem-prem-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </div>
@@ -1060,7 +1184,11 @@ Solution
 <span id="cb116-16"><a href="#cb116-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">forecast</span>(<span class="at">h =</span> <span class="st">"2 years"</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb116-17"><a href="#cb116-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">autoplot</span>(<span class="fu">filter</span>(aus_retail, <span class="fu">year</span>(Month) <span class="sc">&gt;</span> <span class="dv">2010</span>), <span class="at">level =</span> <span class="cn">NULL</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="5_ARIMA_files/figure-html/aus-retail-ex-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="5_ARIMA_files/figure-html/aus-retail-ex-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 
@@ -1147,10 +1275,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1160,8 +1287,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1174,6 +1310,125 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -1217,6 +1472,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -1242,6 +1498,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -1303,10 +1585,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <script src="https://giscus.app/client.js" data-repo="AQLT/formations" data-repo-id="R_kgDOIepagw" data-category="Announcements" data-category-id="DIC_kwDOIepag84CSt5_" data-mapping="pathname" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="light" data-lang="fr" crossorigin="anonymous" data-loading="lazy" async="">
 </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="light">
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">Copyright 2023, Alain Quartier-la-Tente, Insee</div>   
+    <div class="nav-footer-left">
+<p>Copyright 2023, Alain Quartier-la-Tente, Insee</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
     </div>
@@ -1334,6 +1620,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+
 
 
 

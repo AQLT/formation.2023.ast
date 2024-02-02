@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.5.6">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -22,7 +22,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -82,7 +82,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "Pas de résultats",
     "search-matching-documents-text": "documents trouvés",
@@ -91,6 +97,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "correspondance de plus dans ce document",
     "search-more-matches-text": "correspondances de plus dans ce document",
     "search-clear-button-title": "Effacer",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Annuler",
     "search-submit-button-title": "Envoyer",
     "search-label": "Recherche"
@@ -114,15 +121,42 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
 </head>
 
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">CEPE AST 2023</span>
     </a>
@@ -134,25 +168,25 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html" rel="" target=""><i class="bi bi-house" role="img">
+    <a class="nav-link" href="./index.html"> <i class="bi bi-house" role="img">
 </i> 
- <span class="menu-text">Analyse des séries temporelles avec <i class="fa-brands fa-r-project" aria-label="r-project"></i></span></a>
+<span class="menu-text">Analyse des séries temporelles avec R</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="https://aqlt.github.io/teaching/" rel="" target="">
- <span class="menu-text">Ensemble formations</span></a>
+    <a class="nav-link" href="https://aqlt.github.io/teaching/"> 
+<span class="menu-text">Ensemble formations</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="http://github.com/AQLT/formation.2023.ast" rel="" target=""><i class="bi bi-github" role="img">
+    <a class="nav-link" href="http://github.com/AQLT/formation.2023.ast"> <i class="bi bi-github" role="img">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
-            <div class="quarto-navbar-tools">
-</div>
           </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -160,11 +194,12 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
         
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
+
 
 
 
@@ -175,12 +210,12 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
 <!-- echo: false -->
 <!-- --- -->
 <div id="exr-def-st" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 1 </strong></span>Une série temporelle est un processus stochastique, dont on n’observe qu’une réalisation.</p>
+<p><span class="theorem-title"><strong>Exercice 1</strong></span> Une série temporelle est un processus stochastique, dont on n’observe qu’une réalisation.</p>
 <p><strong>A. Vrai</strong></p>
 <p>B. Faux</p>
 </div>
 <div id="exr-err-dplyr-lag" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 2 </strong></span>Que va donner le code suivant :</p>
+<p><span class="theorem-title"><strong>Exercice 2</strong></span> Que va donner le code suivant :</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stats)</span>
@@ -190,27 +225,35 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
 <p>B. Ma série retardée car j’ai chargé le package <code>stats</code> après le package <code>dplyr</code></p>
 </div>
 <div id="exr-lag-diff" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 3 </strong></span>Je souhaite calculer la série différenciée à l’ordre 12 et la série retardée de 1 mois de la série <code>AirPassengers</code>. Quelles fonctions faut-il utiliser ?</p>
+<p><span class="theorem-title"><strong>Exercice 3</strong></span> Je souhaite calculer la série différenciée à l’ordre 12 et la série retardée de 1 mois de la série <code>AirPassengers</code>. Quelles fonctions faut-il utiliser ?</p>
 <p>A. <code>stats::diff(AirPassengers, 12)</code> et <code>stats::lag(AirPassengers, 1)</code></p>
 <p>B. <code>stats::diff(AirPassengers, -12)</code> et <code>stats::lag(AirPassengers, 1)</code></p>
 <p><strong>C. <code>stats::diff(AirPassengers, 12)</code> et <code>stats::lag(AirPassengers, -1)</code></strong></p>
 <p>D. <code>stats::diff(AirPassengers, -12)</code> et <code>stats::lag(AirPassengers, -1)</code></p>
 </div>
 <div id="exr-tsibble" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 4 </strong></span>Quel package permet de manipuler des séries temporelles avec le language du <code>tidyverse</code> .</p>
+<p><span class="theorem-title"><strong>Exercice 4</strong></span> Quel package permet de manipuler des séries temporelles avec le language du <code>tidyverse</code> .</p>
 <p>A. <code>stats</code></p>
 <p>B. <code>xts</code></p>
 <p>C. <code>stats</code></p>
 <p><strong>D. <code>tsibble</code></strong></p>
 </div>
 <div id="exr-autocor" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 5 </strong></span>À quel autocorrélogramme est associé à la série suivante ?</p>
+<p><span class="theorem-title"><strong>Exercice 5</strong></span> À quel autocorrélogramme est associé à la série suivante ?</p>
 <div class="cell">
 <div class="cell-output-display">
-<p><img src="quiz_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="quiz_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output-display">
-<p><img src="quiz_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="quiz_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>A. Image A</p>
@@ -219,7 +262,7 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
 <p>D. Image D</p>
 </div>
 <div id="exr-perod-bb" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 6 </strong></span>À quelle composante est associé le périodogramme suivant :</p>
+<p><span class="theorem-title"><strong>Exercice 6</strong></span> À quelle composante est associé le périodogramme suivant :</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">ts</span>(<span class="fu">cos</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">/</span><span class="dv">12</span><span class="sc">*</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>)) <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span><span class="sc">*</span>pi<span class="sc">/</span><span class="dv">12</span><span class="sc">*</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>)), <span class="at">frequency =</span> <span class="dv">12</span>, <span class="at">start =</span> <span class="dv">2000</span>)</span>
@@ -227,7 +270,11 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">detrend =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"pgram"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="quiz_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="quiz_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>A. Tendance</p>
@@ -236,7 +283,7 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
 <p>D. Irrégulier</p>
 </div>
 <div id="exr-perod-bb" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 7 </strong></span>À quelle composante est associé le périodogramme suivant :</p>
+<p><span class="theorem-title"><strong>Exercice 7</strong></span> À quelle composante est associé le périodogramme suivant :</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>i <span class="ot">=</span> <span class="fu">ts</span>(<span class="fu">rnorm</span>(<span class="dv">100</span>), <span class="at">frequency =</span> <span class="dv">12</span>, <span class="at">start =</span> <span class="dv">2000</span>)</span>
@@ -244,7 +291,11 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">detrend =</span> <span class="cn">FALSE</span>,</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">method =</span> <span class="st">"pgram"</span>, <span class="at">log =</span> <span class="st">"no"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="quiz_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="quiz_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>A. Tendance</p>
@@ -253,12 +304,16 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
 <p><strong>D. Irrégulier</strong></p>
 </div>
 <div id="exr-bx" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 8 </strong></span>La transformation de Box-Cox est-elle adaptée à la série suivante ?</p>
+<p><span class="theorem-title"><strong>Exercice 8</strong></span> La transformation de Box-Cox est-elle adaptée à la série suivante ?</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forecast, <span class="at">quietly =</span> <span class="cn">FALSE</span>, <span class="at">warn.conflicts =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>forecast<span class="sc">::</span><span class="fu">autoplot</span>(expsmooth<span class="sc">::</span>cangas, <span class="at">ylab =</span> <span class="cn">NULL</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="quiz_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="quiz_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>A. Oui</p>
@@ -266,24 +321,32 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
 <p><strong>C. Non</strong></p>
 </div>
 <div id="exr-" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 9 </strong></span>Est-ce que je peux directement utiliser la fonction <code>stl()</code> pour désaisonnaliser cette série ?</p>
+<p><span class="theorem-title"><strong>Exercice 9</strong></span> Est-ce que je peux directement utiliser la fonction <code>stl()</code> pour désaisonnaliser cette série ?</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>forecast<span class="sc">::</span><span class="fu">autoplot</span>(AirPassengers)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="quiz_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="quiz_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p><strong>A. Non car le saisonnalité est multiplicative</strong></p>
 <p>B. Oui car <code>stl()</code> détecte la type de saisonnalité</p>
 </div>
 <div id="exr-cours-cac-40" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 10 </strong></span>Quel modèle peut-on utiliser pour prévoir le cours de clôture du CAC 40 ?</p>
+<p><span class="theorem-title"><strong>Exercice 10</strong></span> Quel modèle peut-on utiliser pour prévoir le cours de clôture du CAC 40 ?</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">window</span>(EuStockMarkets[,<span class="st">"CAC"</span>], <span class="at">start =</span> <span class="dv">1998</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(y, <span class="at">y =</span> <span class="st">"Niveau"</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">main  =</span> <span class="st">"Cours de clôture du CAC 40"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="quiz_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="quiz_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>A. Moyenne des valeurs passées</p>
@@ -291,7 +354,7 @@ gtag('config', 'G-X652XRGDPL', { 'anonymize_ip': true});
 <p>C. Valeur de l’année passée</p>
 </div>
 <div id="exr-ets-co2" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 11 </strong></span>Quel modèle est retenu pour cette série ?</p>
+<p><span class="theorem-title"><strong>Exercice 11</strong></span> Quel modèle est retenu pour cette série ?</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>forecast<span class="sc">::</span><span class="fu">ets</span>(co2, <span class="at">damped =</span> <span class="cn">FALSE</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -322,13 +385,17 @@ Call:
 <p><strong>C. Tendance additive, Saisonnalité additive, bruit multiplicatif</strong></p>
 </div>
 <div id="exr-cours-cac-40-arima" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 12 </strong></span>Quel modèle ARIMA parait plausible pour modéliser le cours de clôture du CAC 40 ?</p>
+<p><span class="theorem-title"><strong>Exercice 12</strong></span> Quel modèle ARIMA parait plausible pour modéliser le cours de clôture du CAC 40 ?</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">=</span> <span class="fu">window</span>(EuStockMarkets[,<span class="st">"CAC"</span>], <span class="at">start =</span> <span class="dv">1998</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">autoplot</span>(y, <span class="at">y =</span> <span class="st">"Niveau"</span>,</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">main  =</span> <span class="st">"Cours de clôture du CAC 40"</span>)</span></code><button title="Copier vers le presse-papier" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="quiz_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="quiz_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>A. ARIMA(1,0,0)</p>
@@ -337,20 +404,20 @@ Call:
 <p><strong>D. ARIMA(0,1,0)</strong></p>
 </div>
 <div id="exr-cours-tend-diff" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 13 </strong></span>Si une série comporte une tendance linéaire et une saisonnalité mensuelle, quelle différenciation faut-il faire ?</p>
+<p><span class="theorem-title"><strong>Exercice 13</strong></span> Si une série comporte une tendance linéaire et une saisonnalité mensuelle, quelle différenciation faut-il faire ?</p>
 <p>A. Régulière : <span class="math inline">\(X_t - X_{t-1}\)</span></p>
 <p><strong>B. Saisonnière : <span class="math inline">\(X_t - X_{t-12}\)</span></strong></p>
 <p>C. Saisonnière et régulière.</p>
 </div>
 <div id="exr-series-journ" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 14 </strong></span>Sur des séries journalières, quelle méthode privilégier pour prendre en compte la saisonnalité ?</p>
+<p><span class="theorem-title"><strong>Exercice 14</strong></span> Sur des séries journalières, quelle méthode privilégier pour prendre en compte la saisonnalité ?</p>
 <p>A. En ajoutant des indicatrices</p>
 <p>B. En différenciant la série</p>
 <p><strong>C. En ajoutant des régresseurs de Fourier</strong></p>
 <p>D. Toutes ces méthodes</p>
 </div>
 <div id="exr-qual-aic" class="theorem exercise">
-<p><span class="theorem-title"><strong>Exercice 15 </strong></span>Pour comparer la qualité prédictive d’un modèle exponentiel et d’un modèle ARIMA, je peux utiliser l’AIC.</p>
+<p><span class="theorem-title"><strong>Exercice 15</strong></span> Pour comparer la qualité prédictive d’un modèle exponentiel et d’un modèle ARIMA, je peux utiliser l’AIC.</p>
 <p>A. Vrai</p>
 <p><strong>B. Faux</strong></p>
 </div>
@@ -437,10 +504,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -450,8 +516,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -464,6 +539,125 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -507,6 +701,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -532,6 +727,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -593,10 +814,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <script src="https://giscus.app/client.js" data-repo="AQLT/formations" data-repo-id="R_kgDOIepagw" data-category="Announcements" data-category-id="DIC_kwDOIepag84CSt5_" data-mapping="pathname" data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="light" data-lang="fr" crossorigin="anonymous" data-loading="lazy" async="">
 </script>
+<input type="hidden" id="giscus-base-theme" value="light">
+<input type="hidden" id="giscus-alt-theme" value="light">
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">Copyright 2023, Alain Quartier-la-Tente, Insee</div>   
+    <div class="nav-footer-left">
+<p>Copyright 2023, Alain Quartier-la-Tente, Insee</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
     </div>
@@ -624,6 +849,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+
 
 
 
